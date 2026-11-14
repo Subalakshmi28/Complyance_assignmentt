@@ -1,0 +1,16 @@
+=== SAHARA MEDICAL SUPPLIES: CONNECTOR BATCH ANALYSIS ===
+Seller: Sahara Medical Supplies FZE (Seller ID: 5, TRN: 100645371900003, Peppol ID: 0235:1006453719)
+Batch: sahara-medical-batch-1116.xlsx
+Total Invoices: 40 (SMS-1116-001 through SMS-1116-040)
+Hand-off from Bluepeak ERP: HTTP 201 Created
+
+ASP Rate Limiting Policy (services/asp-mock/main.go:35-37):
+  senderBurst = 8
+  senderRatePerSec = 2.0
+  Token bucket parameters: Initial capacity = 8 tokens. Refill rate = 2 tokens/sec.
+
+Concurrency:
+  API submitter runs 4 concurrent workers (services/api/internal/submit/submit.go:New(..., 4)).
+  When 40 invoices were enqueued simultaneously:
+  - Invoices 1 to 8: Token bucket had available tokens -> returned HTTP 200 OK (Accepted).
+  - Invoices 9 to 40: Fired within milliseconds (< 0.5s), token bucket exhausted -> ASP returned HTTP 429 Too Many Requests.

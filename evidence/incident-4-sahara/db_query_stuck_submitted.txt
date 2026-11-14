@@ -1,0 +1,25 @@
+-- Database inspection for Sahara Medical import
+SELECT status, count(*), count(NULLIF(asp_message_id, '')) AS with_asp_ref
+FROM invoices
+WHERE seller_id = 5 AND invoice_number LIKE 'SMS-1116-%'
+GROUP BY status;
+
+-- Result:
+-- status    | count | with_asp_ref
+-- Accepted  | 8     | 8
+-- Submitted | 32    | 0
+
+-- Sample stuck invoices:
+SELECT invoice_number, buyer_name, total_incl_vat, status, asp_message_id, updated_at
+FROM invoices
+WHERE seller_id = 5 AND status = 'Submitted'
+ORDER BY invoice_number
+LIMIT 5;
+
+-- Result:
+-- invoice_number | buyer_name                 | total_incl_vat | status    | asp_message_id | updated_at
+-- SMS-1116-009   | Emirates Palm Hospital LLC | 1890.00        | Submitted |                | 2026-11-16 09:12:01.230+04
+-- SMS-1116-010   | Emirates Palm Hospital LLC | 3150.00        | Submitted |                | 2026-11-16 09:12:01.235+04
+-- SMS-1116-011   | Emirates Palm Hospital LLC | 1260.00        | Submitted |                | 2026-11-16 09:12:01.240+04
+-- SMS-1116-012   | Emirates Palm Hospital LLC | 4410.00        | Submitted |                | 2026-11-16 09:12:01.245+04
+-- SMS-1116-013   | Emirates Palm Hospital LLC | 2520.00        | Submitted |                | 2026-11-16 09:12:01.250+04

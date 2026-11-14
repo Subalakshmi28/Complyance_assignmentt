@@ -1,0 +1,45 @@
+=== PARTICIPANT LOOKUP TIMING & TIMEOUT BOTTLENECK CALCULATION ===
+
+1. Code Path:
+   services/api/internal/importer/importer.go:101:
+     for i, g := range groups {
+       errs := im.validator.Validate(ctx, validate.Seller{...}, id, g)
+     }
+   services/api/internal/validate/validate.go:69:
+     for _, row := range g.Rows {
+       errs = append(errs, v.validateRow(ctx, row)...)
+     }
+   services/api/internal/validate/validate.go:165-173:
+     if buyer := r.Get(sheet.ColBuyerPeppolID); buyer != "" {
+       registered, err := v.dir.IsRegistered(ctx, buyer)
+       ...
+     }
+
+2. Simulated SMP/ASP Lookup Latency:
+   services/asp-mock/main.go:40-41:
+     const lookupLatency = 200 * time.Millisecond
+   Every call to GET /v1/participants/{id} sleeps for 200ms.
+
+3. Total Serial Latency:
+   Number of rows: 600 rows
+   Lookups performed: 600 synchronous HTTP roundtrips
+   Total lookup duration = 600 * 200 ms = 120,000 ms = 120 seconds (2.0 minutes).
+
+4. Web Proxy Client Timeout:
+   web/app/api/[...path]/route.ts:6:
+     const UPSTREAM_TIMEOUT_MS = 60_000; // 60 seconds (1 minute)
+
+5. Failure Scenario:
+   - Client initiates POST /api/imports at T = 0s.
+   - At T = 60s, API is halfway through validation (~row 300 / invoice 4).
+   - Next.js Web Proxy hits UPSTREAM_TIMEOUT_MS (60s), aborts connection, and returns:
+     HTTP 504 Gateway Timeout ({"error": "Gateway Timeout"}).
+   - Frontend displays: "The upload did not complete in time (504 Gateway Timeout). Please try again."
+   - In background, API continues processing under processingBudget (10m context).
+   - At T = ~122s, initial upload finishes, all 8 invoices are marked Validated and enqueued for submission.
+   - When Rashid retries at T = 120s or T = 180s, the new upload runs duplicate check:
+     services/api/internal/validate/validate.go:75:
+       ExistingStatus(ctx, seller.ID, g.InvoiceNumber, importID)
+     ExistingStatus finds invoices OBS-2611-001..008 already in DB from the first upload!
+     Second and third uploads are marked Rejected with rule AE-BR-09:
+     'Document number "OBS-2611-00X" already exists for this seller with status "Accepted" (or "Validated").'

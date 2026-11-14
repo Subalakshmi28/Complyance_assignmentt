@@ -1,0 +1,17 @@
+=== GHAF TREE CAFE CELL INSPECTION (GHAF-CAFE-NOV-2026.XLSX) ===
+File: samples/ghaf-cafe-nov-2026.xlsx
+Customer: Ghaf Tree Cafe LLC (Seller ID: 6, TRN: 100754862300003)
+Sheet: 'Invoices'
+
+Inspected Cells:
+Row 2: Invoice GTC-118 | Issue Date: Cell D2 | Value: '13/11/2026' | Type: String | Number Format: General
+Row 2: Invoice GTC-118 | Due Date:   Cell E2 | Value: '13/12/2026' | Type: String | Number Format: General
+Row 4: Invoice GTC-119 | Issue Date: Cell D4 | Value: '13/11/2026' | Type: String | Number Format: General
+Row 4: Invoice GTC-119 | Due Date:   Cell E4 | Value: '13/12/2026' | Type: String | Number Format: General
+Row 6: Invoice GTC-120 | Issue Date: Cell D6 | Value: '14/11/2026' | Type: String | Number Format: General
+Row 6: Invoice GTC-120 | Due Date:   Cell E6 | Value: '14/12/2026' | Type: String | Number Format: General
+Row 9: Invoice GTC-121 | Issue Date: Cell D9 | Value: '15/11/2026' | Type: String | Number Format: General
+Row 9: Invoice GTC-121 | Due Date:   Cell E9 | Value: '15/12/2026' | Type: String | Number Format: General
+
+Finding:
+Both 'Invoice issue date*' and 'Payment due date*' across all invoices were entered as text strings in DD/MM/YYYY format, rather than native Excel dates or ISO YYYY-MM-DD strings.

@@ -1,0 +1,31 @@
+=== SAHARA REMEDIATION & CODE FIX ===
+
+1. Immediate SQL Recovery Script:
+   -- Step 1: Reset stuck invoices from 'Submitted' back to 'Validated'
+   UPDATE invoices
+   SET status = 'Validated', updated_at = now()
+   WHERE seller_id = 5 AND status = 'Submitted' AND asp_message_id = '';
+
+   -- Step 2: Trigger submission via API endpoint
+   -- POST /v1/imports/{import_id}/retry
+
+2. Code Fix for services/api/internal/submit/submit.go:
+   Add handling for http.StatusTooManyRequests (429):
+   ```go
+   case http.StatusTooManyRequests:
+       retryAfter := 2
+       if h := resp.Header.Get("Retry-After"); h != "" {
+           if s, err := strconv.Atoi(h); err == nil {
+               retryAfter = s
+           }
+       }
+       s.log.Warn("throttled by ASP, requeueing with delay", "invoice_id", id, "retry_after_s", retryAfter)
+       _ = s.store.SetStatus(ctx, id, store.StatusValidated, fmt.Sprintf("Throttled by ASP (HTTP 429); will retry after %ds", retryAfter))
+       go func() {
+           time.Sleep(time.Duration(retryAfter) * time.Second)
+           s.Enqueue(id)
+       }()
+   default:
+       metrics.Submissions.WithLabelValues("failed").Inc()
+       _ = s.store.SetStatus(ctx, id, store.StatusFailed, fmt.Sprintf("Unexpected ASP response HTTP %d", resp.StatusCode))
+   ```

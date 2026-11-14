@@ -1,0 +1,20 @@
+=== LOKI LOG EXCERPT: ASP-MOCK & API DURING SAHARA SUBMISSION ===
+
+-- 09:12:01.100 - ASP receives burst of 8:
+{"time":"2026-11-16T09:12:01.102Z","service":"asp-mock","level":"INFO","msg":"document accepted","invoice_number":"SMS-1116-001","message_id":"msg-asp-88102-sms001"}
+...
+{"time":"2026-11-16T09:12:01.210Z","service":"asp-mock","level":"INFO","msg":"document accepted","invoice_number":"SMS-1116-008","message_id":"msg-asp-88109-sms008"}
+
+-- 09:12:01.225 - ASP Token bucket empty, begins throttling:
+{"time":"2026-11-16T09:12:01.226Z","service":"asp-mock","level":"WARN","msg":"rate limit exceeded","sender":"0235:1006453719","retry_after_s":1}
+{"time":"2026-11-16T09:12:01.230Z","service":"api","level":"INFO","msg":"asp response","invoice_id":"sms-inv-009","invoice_number":"SMS-1116-009","status_code":429,"duration_ms":12}
+{"time":"2026-11-16T09:12:01.232Z","service":"asp-mock","level":"WARN","msg":"rate limit exceeded","sender":"0235:1006453719","retry_after_s":1}
+{"time":"2026-11-16T09:12:01.235Z","service":"api","level":"INFO","msg":"asp response","invoice_id":"sms-inv-010","invoice_number":"SMS-1116-010","status_code":429,"duration_ms":11}
+...
+(All 32 invoices from SMS-1116-009 to SMS-1116-040 logged status_code=429)
+
+-- Missing Handler in submit.go:
+In services/api/internal/submit/submit.go:133-155:
+The status code 429 matches NO case in `switch resp.StatusCode`.
+Status in invoices table was set to 'Submitted' at line 114 before sending.
+Because 429 does nothing, the invoice remains stuck in 'Submitted' forever!

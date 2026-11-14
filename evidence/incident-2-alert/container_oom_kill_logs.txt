@@ -1,0 +1,38 @@
+=== DOCKER INSPECT & KERNEL DMESG OOM-KILL EVIDENCE ===
+
+1. docker inspect invoicely-lite-api-1:
+   "State": {
+       "Status": "running",
+       "Running": true,
+       "Paused": false,
+       "Restarting": false,
+       "OOMKilled": true,
+       "Dead": false,
+       "Pid": 142981,
+       "ExitCode": 137,
+       "Error": "",
+       "StartedAt": "2026-11-16T09:41:45.109283Z",
+       "FinishedAt": "2026-11-16T09:41:44.201842Z"
+   },
+   "HostConfig": {
+       "Memory": 134217728,       // 128 MB
+       "MemorySwap": 134217728,   // 128 MB
+       "RestartPolicy": {
+           "Name": "unless-stopped"
+       }
+   }
+
+2. Host Kernel dmesg / syslog:
+   [Nov16 09:28:12] Task in /docker/invoicely-lite_api killed as a result of limit of /docker/invoicely-lite_api
+   [Nov16 09:28:12] memory: usage 131072kB, limit 131072kB, failcnt 4219
+   [Nov16 09:28:12] Memory cgroup out of memory: Killed process 138402 (api) total-vm:412084kB, anon-rss:126940kB, file-rss:3840kB
+   [Nov16 09:35:04] Memory cgroup out of memory: Killed process 139550 (api) total-vm:414120kB, anon-rss:127110kB, file-rss:3780kB
+   [Nov16 09:41:44] Memory cgroup out of memory: Killed process 141210 (api) total-vm:413980kB, anon-rss:127050kB, file-rss:3810kB
+
+3. Container Loki Logs around Restart 3:
+   {"time":"2026-11-16T09:41:40Z","level":"INFO","msg":"import received","bytes":171008,"seller_id":3,"import_id":"f81e...","filename":"mbh-morning-12.xlsx"}
+   {"time":"2026-11-16T09:41:42Z","level":"INFO","msg":"import parsed","rows":18,"invoices":6}
+   -- KILLED (SIGKILL 137) --
+   {"time":"2026-11-16T09:41:46Z","level":"INFO","msg":"api starting","addr":":8080","asp_url":"http://asp-mock:8090"}
+   {"time":"2026-11-16T09:41:46Z","level":"INFO","msg":"submission workers started","workers":4}
+   {"time":"2026-11-16T09:41:46Z","level":"INFO","msg":"api listening","addr":":8080"}

@@ -1,0 +1,39 @@
+-- Query 1: Check recent imports for Oasis Builders Supply (seller_id = 2)
+SELECT id, filename, status, row_count, invoice_count, duration_ms, created_at, completed_at
+FROM imports
+WHERE seller_id = 2
+ORDER BY created_at DESC
+LIMIT 5;
+
+-- Result:
+-- id                                   | filename                    | status    | row_count | invoice_count | duration_ms | created_at                 | completed_at
+-- b1a9c402-4e81-4f12-92a1-0901oasis001 | oasis-builders-nov-2026.xlsx| Completed | 600       | 8             | 122718      | 2026-11-16 09:01:00.120+04 | 2026-11-16 09:03:02.838+04
+-- c2b8d513-5f92-4a23-83b2-0903oasis002 | oasis-builders-nov-2026.xlsx| Completed | 600       | 8             | 10214       | 2026-11-16 09:03:15.205+04 | 2026-11-16 09:03:25.419+04
+-- d3c7e624-6a03-4b34-94c3-0905oasis003 | oasis-builders-nov-2026.xlsx| Completed | 600       | 8             | 9850        | 2026-11-16 09:04:40.110+04 | 2026-11-16 09:04:49.960+04
+
+-- Query 2: Check invoice statuses from the first import (b1a9c402...)
+SELECT invoice_number, buyer_name, total_incl_vat, status, asp_message_id, created_at, updated_at
+FROM invoices
+WHERE import_id = 'b1a9c402-4e81-4f12-92a1-0901oasis001'
+ORDER BY invoice_number;
+
+-- Result:
+-- invoice_number | buyer_name                               | total_incl_vat | status   | asp_message_id                       | created_at                 | updated_at
+-- OBS-2611-001   | Crescent Contracting LLC                 | 248955.00      | Accepted | msg-asp-992182-obs-001-crescent      | 2026-11-16 09:01:00.250+04 | 2026-11-16 09:03:05.110+04
+-- OBS-2611-002   | Northstar Engineering Consultants LLC    | 194320.50      | Accepted | msg-asp-992183-obs-002-northstar     | 2026-11-16 09:01:00.250+04 | 2026-11-16 09:03:05.520+04
+-- OBS-2611-003   | Coral Reef Resorts LLC                   | 312480.00      | Accepted | msg-asp-992184-obs-003-coralreef     | 2026-11-16 09:01:00.250+04 | 2026-11-16 09:03:05.930+04
+-- OBS-2611-004   | Bluewater Facilities Management LLC      | 145210.00      | Accepted | msg-asp-992185-obs-004-bluewater     | 2026-11-16 09:01:00.250+04 | 2026-11-16 09:03:06.340+04
+-- OBS-2611-005   | Crescent Contracting LLC                 | 267890.00      | Accepted | msg-asp-992186-obs-005-crescent      | 2026-11-16 09:01:00.250+04 | 2026-11-16 09:03:06.750+04
+-- OBS-2611-006   | Gulf Horizon Transport LLC               | 188730.00      | Accepted | msg-asp-992187-obs-006-gulfhorizon   | 2026-11-16 09:01:00.250+04 | 2026-11-16 09:03:07.160+04
+-- OBS-2611-007   | Northstar Engineering Consultants LLC    | 215400.00      | Accepted | msg-asp-992188-obs-007-northstar     | 2026-11-16 09:01:00.250+04 | 2026-11-16 09:03:07.570+04
+-- OBS-2611-008   | Coral Reef Resorts LLC                   | 289110.00      | Accepted | msg-asp-992189-obs-008-coralreef     | 2026-11-16 09:01:00.250+04 | 2026-11-16 09:03:07.980+04
+
+-- Query 3: Check invoices from the second import (c2b8d513...)
+SELECT invoice_number, status, rejected_by, errors->0->>'rule' AS rule, errors->0->>'message' AS message
+FROM invoices
+WHERE import_id = 'c2b8d513-5f92-4a23-83b2-0903oasis002'
+ORDER BY invoice_number;
+
+-- Result:
+-- All 8 invoices show:
+-- status = 'Rejected' | rejected_by = 'portal' | rule = 'AE-BR-09' | message = 'Document number "OBS-2611-00X" already exists for this seller with status "Accepted".'

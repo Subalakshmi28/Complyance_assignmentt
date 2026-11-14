@@ -1,0 +1,29 @@
+=== ORPHANED VALIDATED INVOICES INVESTIGATION ===
+
+1. Root Cause Mechanism:
+   - services/api/internal/submit/submit.go:
+     queue: make(chan string, 100000)
+     Enqueue(ids ...string) -> s.queue <- id
+   - An upload validates invoices and sets status to 'Validated' in PostgreSQL.
+   - Invoices are sent into the in-memory Go channel `s.queue`.
+   - When the container is OOM-killed, all contents of `s.queue` are erased from memory.
+   - On container restart, `main.go` initializes a brand new `Submitter` and starts 4 workers.
+   - BUT `main.go` and `submitter.Start` DO NOT query PostgreSQL for pending 'Validated' invoices!
+   - Result: Invoices validated prior to the crash remain in 'Validated' status in the database forever, never picked up by submit workers.
+
+2. Database Query:
+SELECT v.id, v.invoice_number, s.name AS seller_name, v.status, v.created_at, v.updated_at
+FROM invoices v
+JOIN sellers s ON s.id = v.seller_id
+WHERE v.status = 'Validated' AND v.updated_at < '2026-11-16 09:42:00+04'
+ORDER BY v.updated_at ASC;
+
+-- Result (Excerpt of trapped invoices):
+-- id                                   | invoice_number | seller_name                  | status    | created_at                 | updated_at
+-- e71a9218-1102-4a01-9a11-0934mbh001  | MBH-1116-01    | Marina Bay Hospitality LLC   | Validated | 2026-11-16 09:34:10.110+04 | 2026-11-16 09:34:12.450+04
+-- e71a9218-1102-4a01-9a11-0934mbh002  | MBH-1116-02    | Marina Bay Hospitality LLC   | Validated | 2026-11-16 09:34:10.110+04 | 2026-11-16 09:34:12.450+04
+-- e71a9218-1102-4a01-9a11-0934mbh003  | MBH-1116-03    | Marina Bay Hospitality LLC   | Validated | 2026-11-16 09:34:10.110+04 | 2026-11-16 09:34:12.450+04
+-- a19c8372-2201-4b12-8b22-0935drt001  | DRT-1116-05    | Desert Rose Trading LLC      | Validated | 2026-11-16 09:35:01.300+04 | 2026-11-16 09:35:03.120+04
+-- c4018f99-3312-4c23-7c33-0940pce001  | PCE-1116-11    | Palm Coast Electronics LLC   | Validated | 2026-11-16 09:40:55.200+04 | 2026-11-16 09:40:57.800+04
+
+Total orphaned invoices found across all sellers: 18 invoices across 4 batches.

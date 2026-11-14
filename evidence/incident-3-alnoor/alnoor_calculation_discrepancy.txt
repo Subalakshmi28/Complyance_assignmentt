@@ -1,0 +1,59 @@
+=== AL NOOR FUEL & LUBRICANTS: INVOICE ROUNDING DISCREPANCY AUDIT ===
+Customer: Al Noor Fuel & Lubricants LLC (Seller ID: 4, TRN: 100536284100003)
+File: samples/al-noor-fuel-nov-2026.xlsx
+Total Invoices: 6 (ANF-2611-0041 to ANF-2611-0046)
+
+Line-by-line Mathematical Analysis:
+
+1. Invoice ANF-2611-0041:
+   Line 1: Diesel EN590, Qty=4850, Price=2.835, Net=13749.75, Rate=5%, VAT=687.49
+   Sum of Lines Net = 13749.75, VAT = 687.49
+   Expected TaxInclusiveAmount (Net + VAT) = 13749.75 + 687.49 = 14437.24
+   Unrounded gross = 4850 * 2.835 * 1.05 = 14437.2375 -> round2(gross) = 14437.24
+   Difference = 0.00 -> OUTCOME: ACCEPTED
+
+2. Invoice ANF-2611-0042:
+   Line 1: Diesel EN590, Qty=3125, Price=2.917, Net=9115.63, Rate=5%, VAT=455.78
+   Line 2: Petrol Special 95, Qty=1837, Price=2.585, Net=4748.65, Rate=5%, VAT=237.43
+   Line 3: Engine oil 15W-40, Qty=24, Price=18.45, Net=442.80, Rate=5%, VAT=22.14
+   Sum of Lines Net = 9115.63 + 4748.65 + 442.80 = 14307.08
+   Sum of Lines VAT = 455.78 + 237.43 + 22.14 = 715.35
+   Expected TaxInclusiveAmount (Net + VAT) = 14307.08 + 715.35 = 15022.43
+   Unrounded gross accumulated in pint.go:
+     Line 1 gross = 3125 * 2.917 * 1.05 = 9571.40625
+     Line 2 gross = 1837 * 2.585 * 1.05 = 4986.07725
+     Line 3 gross = 24 * 18.45 * 1.05 = 464.94
+     Total gross = 15022.4235 -> round2(gross) = 15022.42
+   Discrepancy: Got 15022.42, Expected 15022.43 (Diff: -0.01 AED)
+   OUTCOME: REJECTED by ASP with BR-CO-15!
+
+3. Invoice ANF-2611-0043:
+   Line 1: Diesel EN590, Qty=6200, Price=2.835, Net=17577.00, VAT=878.85
+   Line 2: Engine oil 15W-40, Qty=60, Price=18.45, Net=1107.00, VAT=55.35
+   Net = 18684.00, VAT = 934.20 -> Expected = 19618.20
+   Total gross = 19618.20 -> round2(gross) = 19618.20
+   Difference = 0.00 -> OUTCOME: ACCEPTED
+
+4. Invoice ANF-2611-0044:
+   Line 1: Diesel EN590, Qty=2275, Price=2.917, Net=6636.18, VAT=331.81
+   Line 2: Petrol Special 95, Qty=1365, Price=2.585, Net=3528.53, VAT=176.43
+   Line 3: AdBlue, Qty=415, Price=1.275, Net=529.13, VAT=26.46
+   Line 4: Hydraulic oil 20 L, Qty=12, Price=46.75, Net=561.00, VAT=28.05
+   Sum Net = 11254.84, Sum VAT = 562.75 -> Expected = 11817.59
+   Total gross = 6967.98375 + 3704.95125 + 555.58125 + 589.05 = 11817.56625 -> round2 = 11817.57
+   Discrepancy: Got 11817.57, Expected 11817.59 (Diff: -0.02 AED)
+   OUTCOME: REJECTED by ASP with BR-CO-15!
+
+5. Invoice ANF-2611-0045:
+   Line 1: Diesel EN590, Qty=3980, Price=2.835, Net=11283.30, VAT=564.16
+   Sum Net = 11283.30, Sum VAT = 564.16 -> Expected = 11847.46
+   Total gross = 3980 * 2.835 * 1.05 = 11847.465 -> round2 = 11847.47
+   Discrepancy: Got 11847.47, Expected 11847.46 (Diff: +0.01 AED)
+   OUTCOME: REJECTED by ASP with BR-CO-15!
+
+6. Invoice ANF-2611-0046:
+   Line 1: Diesel EN590, Qty=1512, Price=2.917, Net=4410.50, VAT=220.53
+   Line 2: AdBlue, Qty=732, Price=1.275, Net=933.30, VAT=46.66
+   Sum Net = 5343.80, Sum VAT = 267.19 -> Expected = 5610.99
+   Total gross = 5610.993 -> round2 = 5610.99
+   Difference = 0.00 -> OUTCOME: ACCEPTED

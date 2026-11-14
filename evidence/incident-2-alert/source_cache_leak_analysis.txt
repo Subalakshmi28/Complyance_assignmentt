@@ -1,0 +1,29 @@
+=== MEMORY LEAK ANALYSIS: SOURCECACHE IN SERVICES/API/INTERNAL/IMPORTER/SOURCES.GO ===
+
+1. Code Inspection:
+   services/api/internal/importer/sources.go:
+   type Source struct {
+       Filename string
+       Raw      []byte
+       Workbook *sheet.Workbook
+       Invoices []*pint.Invoice
+       StoredAt time.Time
+   }
+   type SourceCache struct {
+       mu      sync.RWMutex
+       entries map[string]*Source
+   }
+   func (c *SourceCache) Put(importID string, s *Source) {
+       s.StoredAt = time.Now()
+       c.mu.Lock()
+       c.entries[importID] = s
+       c.mu.Unlock()
+   }
+
+2. The Memory Leak:
+   - For every single upload, `im.sources.Put(id, ...)` inserts the full Source struct into `c.entries`.
+   - `Workbook` retains the full `*excelize.File` instance (which holds unpacked XML structures, sheet data, cell records, and style tables).
+   - There is NO eviction mechanism, NO maximum size, NO LRU, and NO TTL.
+   - Files remain pinned in heap memory forever.
+   - In a production environment with concurrent morning uploads and multi-hundred row files (e.g. Oasis Builders 600 lines), memory climbs exponentially.
+   - Combined with the strict container limit of 128 MB (`mem_limit: 128m`), OOM crash is inevitable.

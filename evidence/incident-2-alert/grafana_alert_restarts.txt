@@ -1,0 +1,28 @@
+=== GRAFANA PROMETHEUS ALERT EVALUATION: INVOICELY API RESTARTED ===
+Alert: InvoicelyApiRestarted
+Service: api
+Severity: critical
+Folder: Invoicely Lite
+State: FIRING at 2026-11-16T09:42:00+04:00
+
+Prometheus Rule Expression:
+  changes(process_start_time_seconds{job="api"}[15m])
+
+Panel: "API process restarts (1h)"
+Value at 09:42: 3 restarts within the last 15 minutes
+Previous values: 0 (stable from 08:00 to 09:25)
+Jump observed:
+  09:28: restart 1
+  09:35: restart 2
+  09:41: restart 3
+
+Related Grafana Metrics:
+1. Panel "Container memory (working set)":
+   Query: sum by (service) (container_memory_working_set_bytes{container_label_com_docker_compose_service="api"})
+   Observed value: sharp ramp up from 42 MB at 09:00 to 127.8 MB at 09:28, hitting 128 MB limit (cgroup limit).
+2. Panel "API Go heap in use":
+   Query: go_memstats_heap_inuse_bytes{job="api"}
+   Observed: Steady accumulation of heap allocations never being garbage collected due to SourceCache map retention.
+3. Panel "5xx responses (15m)":
+   Query: sum(increase(invoicely_http_request_duration_seconds_count{code=~"5.."}[15m]))
+   Observed: 34 errors (502 Bad Gateway) coinciding with API downtime periods during container restarts.

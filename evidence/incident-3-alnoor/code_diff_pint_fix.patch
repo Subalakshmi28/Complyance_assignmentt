@@ -1,0 +1,32 @@
+--- a/services/api/internal/pint/pint.go
++++ b/services/api/internal/pint/pint.go
+@@ -158,3 +158,3 @@
+ func computeTotals(lines []Line) ([]TaxSubtotal, Totals) {
+ 	byCategory := map[string]*TaxSubtotal{}
+-	var net, vat, gross float64
++	var net, vat float64
+ 	for _, l := range lines {
+@@ -170,3 +170,2 @@
+ 		net += l.NetAmount
+ 		vat += l.VATAmount
+-		gross += l.Quantity * l.UnitPrice * (1 + l.VATRate/100)
+ 	}
+@@ -178,3 +177,5 @@
+ 	}
+ 	sort.Slice(subtotals, func(i, j int) bool { return subtotals[i].Category < subtotals[j].Category })
++	roundedNet := round2(net)
++	roundedVAT := round2(vat)
++	roundedInclusive := round2(roundedNet + roundedVAT)
+ 	return subtotals, Totals{
+-		LineExtensionAmount: round2(net),
+-		TaxExclusiveAmount:  round2(net),
+-		TaxAmount:           round2(vat),
+-		TaxInclusiveAmount:  round2(gross),
+-		PayableAmount:       round2(gross),
++		LineExtensionAmount: roundedNet,
++		TaxExclusiveAmount:  roundedNet,
++		TaxAmount:           roundedVAT,
++		TaxInclusiveAmount:  roundedInclusive,
++		PayableAmount:       roundedInclusive,
+ 	}
+ }

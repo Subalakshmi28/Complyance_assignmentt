@@ -1,0 +1,14 @@
+=== PORTAL VALIDATION LOG FOR GHAF TREE CAFE ===
+Import ID: imp-ghaf-nov-001
+Filename: ghaf-cafe-nov-2026.xlsx
+Outcome: 4 invoices processed, 4 rejected by portal.
+
+Validation Error Details:
+- Invoice GTC-118 (Row 2): Rule AE-BR-04, Field 'Invoice issue date*', Message: "[Invoice issue date*] must be a date in YYYY-MM-DD format (got '13/11/2026')."
+- Invoice GTC-118 (Row 2): Rule AE-BR-04, Field 'Payment due date*', Message: "[Payment due date*] must be a date in YYYY-MM-DD format (got '13/12/2026')."
+- Invoice GTC-119 (Row 4): Rule AE-BR-04, Field 'Invoice issue date*', Message: "[Invoice issue date*] must be a date in YYYY-MM-DD format (got '13/11/2026')."
+- Invoice GTC-119 (Row 4): Rule AE-BR-04, Field 'Payment due date*', Message: "[Payment due date*] must be a date in YYYY-MM-DD format (got '13/12/2026')."
+- Invoice GTC-120 (Row 6): Rule AE-BR-04, Field 'Invoice issue date*', Message: "[Invoice issue date*] must be a date in YYYY-MM-DD format (got '14/11/2026')."
+- Invoice GTC-120 (Row 6): Rule AE-BR-04, Field 'Payment due date*', Message: "[Payment due date*] must be a date in YYYY-MM-DD format (got '14/12/2026')."
+- Invoice GTC-121 (Row 9): Rule AE-BR-04, Field 'Invoice issue date*', Message: "[Invoice issue date*] must be a date in YYYY-MM-DD format (got '15/11/2026')."
+- Invoice GTC-121 (Row 9): Rule AE-BR-04, Field 'Payment due date*', Message: "[Payment due date*] must be a date in YYYY-MM-DD format (got '15/12/2026')."

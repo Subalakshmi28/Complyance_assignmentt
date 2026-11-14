@@ -1,0 +1,22 @@
+=== OASIS BUILDERS SUPPLY (OASIS-BUILDERS-NOV-2026.XLSX) FILE ANALYSIS ===
+Seller: Oasis Builders Supply LLC (Seller ID: 2, TRN: 100318274600003, Peppol ID: 0235:1003182746)
+Total Rows in Invoices sheet: 600
+Total Invoices: 8 (OBS-2611-001 through OBS-2611-008)
+Lines per Invoice: exactly 75 lines each
+
+Invoice Breakdown:
+1. OBS-2611-001 | 75 lines | Buyer: Crescent Contracting LLC (Peppol: 0235:1001415069)
+2. OBS-2611-002 | 75 lines | Buyer: Northstar Engineering Consultants LLC (Peppol: 0235:1001748392)
+3. OBS-2611-003 | 75 lines | Buyer: Coral Reef Resorts LLC (Peppol: 0235:1001859403)
+4. OBS-2611-004 | 75 lines | Buyer: Bluewater Facilities Management LLC (Peppol: 0235:1001304958)
+5. OBS-2611-005 | 75 lines | Buyer: Crescent Contracting LLC (Peppol: 0235:1001415069)
+6. OBS-2611-006 | 75 lines | Buyer: Gulf Horizon Transport LLC (Peppol: 0235:1001526170)
+7. OBS-2611-007 | 75 lines | Buyer: Northstar Engineering Consultants LLC (Peppol: 0235:1001748392)
+8. OBS-2611-008 | 75 lines | Buyer: Coral Reef Resorts LLC (Peppol: 0235:1001859403)
+
+Unique Buyers across all 600 rows: 5
+- Crescent Contracting LLC (0235:1001415069): 150 rows
+- Northstar Engineering Consultants LLC (0235:1001748392): 150 rows
+- Coral Reef Resorts LLC (0235:1001859403): 150 rows
+- Bluewater Facilities Management LLC (0235:1001304958): 75 rows
+- Gulf Horizon Transport LLC (0235:1001526170): 75 rows

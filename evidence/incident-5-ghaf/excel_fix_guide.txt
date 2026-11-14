@@ -1,0 +1,29 @@
+=== CUSTOMER STEP-BY-STEP EXCEL GUIDE: FIXING DATE FORMAT ===
+
+Why this happens:
+The UAE Federal Tax Authority (FTA) Peppol e-invoicing standard requires dates in the international standard format: YYYY-MM-DD (Year-Month-Day).
+When dates are typed as text like "05/11/2026", computers cannot reliably tell if it means 5th November or 11th May. To prevent tax compliance errors, the portal requires YYYY-MM-DD.
+
+How to fix your file in 60 seconds:
+
+Method 1: Change to YYYY-MM-DD
+1. In your Excel file, click on the "Invoice issue date*" column (Column D).
+2. Replace:
+   - 13/11/2026 with 2026-11-13
+   - 14/11/2026 with 2026-11-14
+   - 15/11/2026 with 2026-11-15
+3. In the "Payment due date*" column (Column E), replace:
+   - 13/12/2026 with 2026-12-13
+   - 14/12/2026 with 2026-12-14
+   - 15/12/2026 with 2026-12-15
+4. Save the file and upload again.
+
+Method 2: Use Excel Date Format
+1. Highlight columns D and E.
+2. Right-click and choose "Format Cells..." (or press Ctrl+1).
+3. Under "Category", select "Date".
+4. Choose the format that looks like 2012-03-14 (YYYY-MM-DD).
+5. Click OK, save, and upload.
+
+Note:
+Because these invoices were rejected, your invoice numbers (GTC-118, GTC-119, GTC-120, GTC-121) have NOT been used up. You can upload the corrected file with the exact same invoice numbers immediately!

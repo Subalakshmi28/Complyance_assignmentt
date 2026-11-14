@@ -1,0 +1,28 @@
+=== ASP ERROR RESPONSE LOG FOR ANF-2611-0042 ===
+HTTP Status: 422 Unprocessable Entity
+Endpoint: POST /v1/documents
+Sender: 0235:1005362841
+Invoice: ANF-2611-0042
+
+Payload Totals Sent by Portal:
+{
+  "totals": {
+    "lineExtensionAmount": 14307.08,
+    "taxExclusiveAmount": 14307.08,
+    "taxAmount": 715.35,
+    "taxInclusiveAmount": 15022.42,
+    "payableAmount": 15022.42
+  }
+}
+
+ASP Response Body:
+{
+  "status": "rejected",
+  "messageId": "msg-asp-err-710294-anf0042",
+  "errors": [
+    {
+      "rule": "BR-CO-15",
+      "message": "Invoice total amount with VAT (IBT-112) must equal Invoice total amount without VAT (IBT-109) + Invoice total VAT amount (IBT-110). Got 15022.42, expected 15022.43."
+    }
+  ]
+}
